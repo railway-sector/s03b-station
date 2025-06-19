@@ -185,6 +185,7 @@ export const buildingLayer = new BuildingSceneLayer({
       url: "https://gis.railway-sector.com/portal",
     },
   },
+  title: "Station Structure",
 });
 
 // Discipline: Architectural
@@ -299,6 +300,12 @@ buildingLayer.when(() => {
     switch (layer.modelName) {
       case "FullModel":
         layer.visible = true;
+        break;
+
+      case "Overview":
+        exteriorShellLayer = layer;
+        exteriorShellLayer.visible = false;
+        exteriorShellLayer.title = "Exterior Shell";
         break;
 
       case "Floors":
