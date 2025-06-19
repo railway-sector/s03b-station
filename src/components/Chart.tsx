@@ -286,7 +286,7 @@ const Chart = () => {
           siteLayer.visible = false;
           stairsLayer.visible = false;
           stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[3]) {
+        } else if (categorySelect === buildingLayerCategory[4]) {
           stFoundationLayer.visible = false;
           stFramingLayer.visible = false;
           stColumnLayer.visible = false;
@@ -297,7 +297,7 @@ const Chart = () => {
           siteLayer.visible = false;
           stairsLayer.visible = false;
           stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[4]) {
+        } else if (categorySelect === buildingLayerCategory[5]) {
           stFoundationLayer.visible = false;
           stFramingLayer.visible = false;
           stColumnLayer.visible = false;
@@ -308,7 +308,7 @@ const Chart = () => {
           siteLayer.visible = false;
           stairsLayer.visible = false;
           stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[5]) {
+        } else if (categorySelect === buildingLayerCategory[6]) {
           stFoundationLayer.visible = false;
           stFramingLayer.visible = false;
           stColumnLayer.visible = false;
