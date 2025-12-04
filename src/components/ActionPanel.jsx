@@ -227,12 +227,17 @@ function ActionPanel() {
               This smart map shows the construction progress on structural
               components of station buildings:
               <ul>
-                <li>Structural Foundation, </li>
-                <li>Structural Column, </li>
-                <li>Structural Framing, </li>
-                <li>Floors, </li>
-                <li>Walls, </li>
-                <li>Others </li>
+                <span style={{ fontWeight: "bold" }}>Belowground:</span>
+                <li>D-Wall (Architectural: Site), </li>
+                <li>Underground Slab (Structural: Structural Foundation), </li>
+                <li>Underground Piles (Structural: Structural Columns), </li>
+              </ul>
+              <ul>
+                <span style={{ fontWeight: "bold" }}>Aboveground:</span>
+                <li>Foundation (Structural: Structural Foundation), </li>
+                <li>Piles (Structural: Structural Columns), </li>
+                <li>Roof (Structural: Structural Framing), </li>
+                <li>Beams (Structural: Structural Framing), </li>
               </ul>
               <div style={{ paddingLeft: "20px" }}>
                 <li>

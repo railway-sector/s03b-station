@@ -13,7 +13,6 @@ import {
 } from "@arcgis/core/symbols";
 import BuildingSceneLayer from "@arcgis/core/layers/BuildingSceneLayer";
 import SolidEdges3D from "@arcgis/core/symbols/edges/SolidEdges3D";
-import SceneLayer from "@arcgis/core/layers/SceneLayer";
 
 export const dateTable = new FeatureLayer({
   portalItem: {
@@ -196,7 +195,7 @@ stationLayer.listMode = "hide";
 /* Building Scene Layer for station structures */
 export const buildingLayer = new BuildingSceneLayer({
   portalItem: {
-    id: "b3555b42608f474e8f74e8baaa40885e",
+    id: "f9387908df044a8aba99608333bf9f86",
     portal: {
       url: "https://gis.railway-sector.com/portal",
     },
@@ -220,15 +219,11 @@ export let stFoundationLayer: null | any;
 export let exteriorShellLayer: null | any;
 
 export const popuTemplate = {
-  title: "{Station}",
+  title: "<div style='color: #eaeaea'>{Types}</div>",
   content: [
     {
       type: "fields",
       fieldInfos: [
-        // {
-        //   fieldName: 'target_date',
-        //   label: 'Target Date',
-        // },
         {
           fieldName: "Category",
           label: "Category",
@@ -238,13 +233,13 @@ export const popuTemplate = {
           label: "Construction Status",
         },
         {
-          fieldName: "BldgLevel",
-          label: "Building Level",
+          fieldName: "Component",
+          label: "Component",
         },
-        // {
-        //   fieldName: "StructureLevel",
-        //   label: "Structure Level",
-        // },
+        {
+          fieldName: "t02__End_Date",
+          label: "End Date",
+        },
       ],
     },
   ],
@@ -256,6 +251,22 @@ const colorStatus = [
   [255, 0, 0, 0.8], // Delayed
   [0, 112, 255, 0.8], // Completed
 ];
+
+const rendererExteriorShell = new SimpleRenderer({
+  symbol: new MeshSymbol3D({
+    symbolLayers: [
+      new FillSymbol3DLayer({
+        material: {
+          color: [235, 236, 240, 0],
+          colorMixMode: "replace",
+        },
+        edges: new SolidEdges3D({
+          color: [225, 225, 225, 0.3],
+        }),
+      }),
+    ],
+  }),
+});
 
 const renderer = new UniqueValueRenderer({
   field: "Status",
@@ -322,12 +333,14 @@ buildingLayer.when(() => {
         exteriorShellLayer = layer;
         exteriorShellLayer.visible = false;
         exteriorShellLayer.title = "Exterior Shell";
+        exteriorShellLayer.renderer = rendererExteriorShell;
         break;
 
       case "Floors":
         floorsLayer = layer;
         floorsLayer.popupTemplate = popuTemplate;
         floorsLayer.title = "Floors";
+        floorsLayer.definitionExpression = "Component = 'UG'";
         floorsLayer.renderer = renderer;
         //excludedLayers
         break;
@@ -336,6 +349,7 @@ buildingLayer.when(() => {
         wallsLayer = layer;
         wallsLayer.popupTemplate = popuTemplate;
         wallsLayer.title = "Walls";
+        wallsLayer.definitionExpression = "Component = 'UG'";
         wallsLayer.renderer = renderer;
         break;
 
@@ -350,6 +364,7 @@ buildingLayer.when(() => {
         roomsLayer = layer;
         roomsLayer.popupTemplate = popuTemplate;
         roomsLayer.title = "Rooms";
+        roomsLayer.definitionExpression = "Component = 'UG'";
         roomsLayer.renderer = renderer;
         break;
 
@@ -357,6 +372,7 @@ buildingLayer.when(() => {
         siteLayer = layer;
         siteLayer.popupTemplate = popuTemplate;
         siteLayer.title = "Site";
+        siteLayer.definitionExpression = "Component = 'UG'";
         siteLayer.renderer = renderer;
         break;
 
@@ -364,6 +380,7 @@ buildingLayer.when(() => {
         stairsLayer = layer;
         stairsLayer.popupTemplate = popuTemplate;
         stairsLayer.title = "Stairs";
+        stairsLayer.definitionExpression = "Component = 'UG'";
         stairsLayer.renderer = renderer;
         break;
 
@@ -371,6 +388,7 @@ buildingLayer.when(() => {
         stairsRailingLayer = layer;
         stairsRailingLayer.popupTemplate = popuTemplate;
         stairsRailingLayer.title = "StairsRailing";
+        stairsRailingLayer.definitionExpression = "Component = 'UG'";
         stairsRailingLayer.renderer = renderer;
         break;
 
@@ -378,6 +396,7 @@ buildingLayer.when(() => {
         stFramingLayer = layer;
         stFramingLayer.popupTemplate = popuTemplate;
         stFramingLayer.title = "Structural Framing";
+        stFramingLayer.definitionExpression = "Component = 'UG'";
         stFramingLayer.renderer = renderer;
         break;
 
@@ -385,6 +404,7 @@ buildingLayer.when(() => {
         stColumnLayer = layer;
         stColumnLayer.popupTemplate = popuTemplate;
         stColumnLayer.title = "Structural Columns";
+        stColumnLayer.definitionExpression = "Component = 'UG'";
         stColumnLayer.renderer = renderer;
         break;
 
@@ -392,6 +412,7 @@ buildingLayer.when(() => {
         stFoundationLayer = layer;
         stFoundationLayer.popupTemplate = popuTemplate;
         stFoundationLayer.title = "Structural Foundation";
+        stFoundationLayer.definitionExpression = "Component = 'UG'";
         stFoundationLayer.renderer = renderer;
         break;
 

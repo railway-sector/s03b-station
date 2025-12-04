@@ -57,20 +57,33 @@ export async function dateUpdate() {
 
 export const stationValue = 18; // FTI
 
-export const buildingLayerCategory = [
-  "St.Foundation",
-  "St.Framing",
-  "St.Column",
-  "Columns",
-  "Floors",
-  "Walls",
-  "Others",
-  //   'GenericModel',
-  //   'Rooms',
-  //   'Site',
-  //   'Stairs',
-  //   'StairsRailing',
-];
+export const buildingLayerCategory_underground = ["D-Wall", "Slab", "Pile"];
+
+export const layerFilterForUnderground = () => {
+  stColumnLayer.definitionExpression = "Component = 'UG'";
+  stFoundationLayer.definitionExpression = "Component = 'UG'";
+  stFramingLayer.definitionExpression = "Component = 'UG'";
+  floorsLayer.definitionExpression = "Component = 'UG'";
+  wallsLayer.definitionExpression = "Component = 'UG'";
+  roomsLayer.definitionExpression = "Component = 'UG'";
+  siteLayer.definitionExpression = "Component = 'UG'";
+  stairsLayer.definitionExpression = "Component = 'UG'";
+  stairsRailingLayer.definitionExpression = "Component = 'UG'";
+  genericLayer.definitionExpression = "Component = 'UG'";
+};
+
+export const layerFilterForAboveground = () => {
+  stColumnLayer.definitionExpression = "Component = 'ATG'";
+  stFoundationLayer.definitionExpression = "Component = 'ATG'";
+  stFramingLayer.definitionExpression = "Component = 'ATG'";
+  floorsLayer.definitionExpression = "Component = 'ATG'";
+  wallsLayer.definitionExpression = "Component = 'ATG'";
+  roomsLayer.definitionExpression = "Component = 'ATG'";
+  siteLayer.definitionExpression = "Component = 'ATG'";
+  stairsLayer.definitionExpression = "Component = 'ATG'";
+  stairsRailingLayer.definitionExpression = "Component = 'ATG'";
+  genericLayer.definitionExpression = "Component = 'ATG'";
+};
 
 export const layerVisibleTrue = () => {
   stColumnLayer.visible = true;
@@ -86,331 +99,299 @@ export const layerVisibleTrue = () => {
   buildingLayer.visible = true;
 };
 
-export async function generateChartData() {
-  var total_incomp = new StatisticDefinition({
-    onStatisticField: "CASE WHEN Status = 1 THEN 1 ELSE 0 END",
-    outStatisticFieldName: "total_incomp",
+// The following layers do not have fields: "Station", "Status", "Component", "Types"
+// 1. stairsRailing
+// 2. Rooms
+// 3. Stairs
+// 4. genericModel
+
+export async function generateChartDataUnderground() {
+  var total_incomp_dwall = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 1 and Types = 'D-Wall') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_incomp_dwall",
     statisticType: "sum",
   });
 
-  var total_comp = new StatisticDefinition({
-    onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-    outStatisticFieldName: "total_comp",
+  var total_comp_dwall = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 4 and Types = 'D-Wall') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_comp_dwall",
+    statisticType: "sum",
+  });
+
+  var total_incomp_slab = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 1 and Types = 'Underground Slab') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_incomp_slab",
+    statisticType: "sum",
+  });
+
+  var total_comp_slab = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 4 and Types = 'Underground Slab') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_comp_slab",
+    statisticType: "sum",
+  });
+
+  var total_incomp_piles = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 1 and Types = 'Underground Piles') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_incomp_piles",
+    statisticType: "sum",
+  });
+
+  var total_comp_piles = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 4 and Types = 'Underground Piles') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_comp_piles",
     statisticType: "sum",
   });
 
   var query = new Query();
-  query.outStatistics = [total_incomp, total_comp];
-  const queryExpression = "Station = " + stationValue;
+  query.outStatistics = [
+    total_incomp_dwall,
+    total_comp_dwall,
+    total_incomp_slab,
+    total_comp_slab,
+    total_incomp_piles,
+    total_comp_piles,
+  ];
+  const queryExpression = "Component = 'UG'" + " AND " + "Types IS NOT NULL";
 
   stColumnLayer.definitionExpression = queryExpression;
   stFoundationLayer.definitionExpression = queryExpression;
   stFramingLayer.definitionExpression = queryExpression;
   floorsLayer.definitionExpression = queryExpression;
   wallsLayer.definitionExpression = queryExpression;
-  genericLayer.definitionExpression = queryExpression;
-  roomsLayer.definitionExpression = queryExpression;
   siteLayer.definitionExpression = queryExpression;
-  stairsLayer.definitionExpression = queryExpression;
-  stairsRailingLayer.definitionExpression = queryExpression;
 
   query.where = queryExpression;
   layerVisibleTrue();
 
-  const stColumnCompile = stColumnLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_incomp = stats.total_incomp;
-      const total_comp = stats.total_comp;
-      return [total_incomp, total_comp];
-    });
-
-  const stFoundationCompile = stFoundationLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_incomp = stats.total_incomp;
-      const total_comp = stats.total_comp;
-
-      return [total_incomp, total_comp];
-    });
-
-  const stFramingCompile = stFramingLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_incomp = stats.total_incomp;
-      const total_comp = stats.total_comp;
-
-      return [total_incomp, total_comp];
-    });
-
-  const floorsCompile = floorsLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_incomp = stats.total_incomp;
-      const total_comp = stats.total_comp;
-
-      return [total_incomp, total_comp];
-    });
-
-  const wallsCompile = wallsLayer.queryFeatures(query).then((response: any) => {
+  const dwall_query = siteLayer.queryFeatures(query).then((response: any) => {
     var stats = response.features[0].attributes;
-    const total_incomp = stats.total_incomp;
-    const total_comp = stats.total_comp;
-
+    const total_incomp = stats.total_incomp_dwall;
+    const total_comp = stats.total_comp_dwall;
     return [total_incomp, total_comp];
   });
 
-  const genericCompile = genericLayer
+  const ug_slab_query = stFoundationLayer
     .queryFeatures(query)
     .then((response: any) => {
       var stats = response.features[0].attributes;
-      const total_incomp = stats.total_incomp;
-      const total_comp = stats.total_comp;
+      const total_incomp = stats.total_incomp_slab;
+      const total_comp = stats.total_comp_slab;
 
       return [total_incomp, total_comp];
     });
 
-  const roomsCompile = roomsLayer.queryFeatures(query).then((response: any) => {
-    var stats = response.features[0].attributes;
-    const total_incomp = stats.total_incomp;
-    const total_comp = stats.total_comp;
-
-    return [total_incomp, total_comp];
-  });
-
-  const siteCompile = siteLayer.queryFeatures(query).then((response: any) => {
-    var stats = response.features[0].attributes;
-    const total_incomp = stats.total_incomp;
-    const total_comp = stats.total_comp;
-
-    return [total_incomp, total_comp];
-  });
-
-  const stairsCompile = stairsLayer
+  const ug_pile_query = stColumnLayer
     .queryFeatures(query)
     .then((response: any) => {
       var stats = response.features[0].attributes;
-      const total_incomp = stats.total_incomp;
-      const total_comp = stats.total_comp;
+      const total_incomp = stats.total_incomp_piles;
+      const total_comp = stats.total_comp_piles;
 
       return [total_incomp, total_comp];
     });
 
-  const stairsRailingCompile = stairsRailingLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_incomp = stats.total_incomp;
-      const total_comp = stats.total_comp;
-
-      return [total_incomp, total_comp];
-    });
-
-  const stcolumn = await stColumnCompile;
-  const stfoundation = await stFoundationCompile;
-  const stframing = await stFramingCompile;
-  const floors = await floorsCompile;
-  const walls = await wallsCompile;
-  const generic = await genericCompile;
-  const rooms = await roomsCompile;
-  const site = await siteCompile;
-  const stairs = await stairsCompile;
-  const stairsRailing = await stairsRailingCompile;
-
-  const others_comp =
-    rooms[1] + generic[1] + site[1] + stairs[1] + stairsRailing[1];
-  const others_incomp =
-    rooms[0] + generic[0] + site[0] + stairs[0] + stairsRailing[0];
+  const d_wall = await dwall_query;
+  const ug_slab = await ug_slab_query;
+  const ug_pile = await ug_pile_query;
+  const total =
+    d_wall[0] + d_wall[1] + ug_slab[0] + ug_slab[1] + ug_pile[0] + ug_pile[1];
+  const total_comp = d_wall[1] + ug_slab[1] + ug_pile[1];
+  const percent_comp = ((total_comp / total) * 100).toFixed(1);
 
   const data = [
     {
-      category: buildingLayerCategory[0],
-      comp: stfoundation[1],
-      incomp: stfoundation[0],
+      category: buildingLayerCategory_underground[0],
+      comp: d_wall[1],
+      incomp: d_wall[0],
     },
     {
-      category: buildingLayerCategory[1],
-      comp: stframing[1],
-      incomp: stframing[0],
+      category: buildingLayerCategory_underground[1],
+      comp: ug_slab[1],
+      incomp: ug_slab[0],
     },
     {
-      category: buildingLayerCategory[2],
-      comp: stcolumn[1],
-      incomp: stcolumn[0],
-    },
-    {
-      category: buildingLayerCategory[4],
-      comp: floors[1],
-      incomp: floors[0],
-      ongoing: floors[2],
-    },
-    {
-      category: buildingLayerCategory[5],
-      comp: walls[1],
-      incomp: walls[0],
-    },
-    {
-      category: buildingLayerCategory[6],
-      comp: others_comp,
-      incomp: others_incomp,
+      category: buildingLayerCategory_underground[2],
+      comp: ug_pile[1],
+      incomp: ug_pile[0],
     },
   ];
 
-  return data;
+  return [data, total_comp, percent_comp];
 }
 
-export async function generateTotalProgress() {
-  var total_number = new StatisticDefinition({
-    onStatisticField: "Status",
-    outStatisticFieldName: "total_number",
-    statisticType: "count",
+export const buildingLayerCategory_aboveground = [
+  "Foundation",
+  "Piles",
+  "Roof",
+  "Beams",
+];
+
+export async function generateChartDataAboveground() {
+  var total_incomp_foundation = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 1 and Types = 'Foundation') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_incomp_foundation",
+    statisticType: "sum",
   });
 
-  var total_comp = new StatisticDefinition({
-    onStatisticField: "CASE WHEN Status = 4 THEN 1 ELSE 0 END",
-    outStatisticFieldName: "total_comp",
+  var total_comp_foundation = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 4 and Types = 'Foundation') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_comp_foundation",
+    statisticType: "sum",
+  });
+
+  var total_incomp_piles = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 1 and Types = 'Piles') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_incomp_piles",
+    statisticType: "sum",
+  });
+
+  var total_comp_piles = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 4 and Types = 'Piles') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_comp_piles",
+    statisticType: "sum",
+  });
+
+  var total_incomp_roof = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 1 and Types = 'Roof') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_incomp_roof",
+    statisticType: "sum",
+  });
+
+  var total_comp_roof = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 4 and Types = 'Roof') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_comp_roof",
+    statisticType: "sum",
+  });
+
+  var total_incomp_beam = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 1 and Types = 'Beam') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_incomp_beam",
+    statisticType: "sum",
+  });
+
+  var total_comp_beam = new StatisticDefinition({
+    onStatisticField:
+      "CASE WHEN (Status = 4 and Types = 'Beam') THEN 1 ELSE 0 END",
+    outStatisticFieldName: "total_comp_beam",
     statisticType: "sum",
   });
 
   var query = new Query();
-  query.outStatistics = [total_number, total_comp];
-  const queryExpression = "Station = " + stationValue;
+  query.outStatistics = [
+    total_incomp_foundation,
+    total_comp_foundation,
+    total_incomp_piles,
+    total_comp_piles,
+    total_incomp_roof,
+    total_comp_roof,
+    total_incomp_beam,
+    total_comp_beam,
+  ];
+  const queryExpression = "Component = 'ATG'" + " AND " + "Types IS NOT NULL";
+
+  stColumnLayer.definitionExpression = queryExpression;
+  stFoundationLayer.definitionExpression = queryExpression;
+  stFramingLayer.definitionExpression = queryExpression;
+  floorsLayer.definitionExpression = queryExpression;
+  wallsLayer.definitionExpression = queryExpression;
+  siteLayer.definitionExpression = queryExpression;
+
   query.where = queryExpression;
+  layerVisibleTrue();
 
-  const stColumnCompile = stColumnLayer
+  const foundation_query = stFoundationLayer
     .queryFeatures(query)
     .then((response: any) => {
       var stats = response.features[0].attributes;
-      const total_number = stats.total_number;
-      const total_comp = stats.total_comp;
-
-      return [total_number, total_comp];
+      const total_incomp = stats.total_incomp_foundation;
+      const total_comp = stats.total_comp_foundation;
+      return [total_incomp, total_comp];
     });
 
-  const stFoundationCompile = stFoundationLayer
+  const piles_query = stColumnLayer
     .queryFeatures(query)
     .then((response: any) => {
       var stats = response.features[0].attributes;
-      const total_number = stats.total_number;
-      const total_comp = stats.total_comp;
+      const total_incomp = stats.total_incomp_piles;
+      const total_comp = stats.total_comp_piles;
 
-      return [total_number, total_comp];
+      return [total_incomp, total_comp];
     });
 
-  const stFramingCompile = stFramingLayer
+  const roof_query = stFramingLayer
     .queryFeatures(query)
     .then((response: any) => {
       var stats = response.features[0].attributes;
-      const total_number = stats.total_number;
-      const total_comp = stats.total_comp;
+      const total_incomp = stats.total_incomp_roof;
+      const total_comp = stats.total_comp_roof;
 
-      return [total_number, total_comp];
+      return [total_incomp, total_comp];
     });
 
-  const floorsCompile = floorsLayer
+  const beam_query = stFramingLayer
     .queryFeatures(query)
     .then((response: any) => {
       var stats = response.features[0].attributes;
-      const total_number = stats.total_number;
-      const total_comp = stats.total_comp;
+      const total_incomp = stats.total_incomp_beam;
+      const total_comp = stats.total_comp_beam;
 
-      return [total_number, total_comp];
+      return [total_incomp, total_comp];
     });
 
-  const wallsCompile = wallsLayer.queryFeatures(query).then((response: any) => {
-    var stats = response.features[0].attributes;
-    const total_number = stats.total_number;
-    const total_comp = stats.total_comp;
-
-    return [total_number, total_comp];
-  });
-
-  const genericCompile = genericLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_number = stats.total_number;
-      const total_comp = stats.total_comp;
-
-      return [total_number, total_comp];
-    });
-
-  const roomsCompile = roomsLayer.queryFeatures(query).then((response: any) => {
-    var stats = response.features[0].attributes;
-    const total_number = stats.total_number;
-    const total_comp = stats.total_comp;
-
-    return [total_number, total_comp];
-  });
-
-  const siteCompile = siteLayer.queryFeatures(query).then((response: any) => {
-    var stats = response.features[0].attributes;
-    const total_number = stats.total_number;
-    const total_comp = stats.total_comp;
-
-    return [total_number, total_comp];
-  });
-
-  const stairsCompile = stairsLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_number = stats.total_number;
-      const total_comp = stats.total_comp;
-
-      return [total_number, total_comp];
-    });
-
-  const stairsRailingCompile = stairsRailingLayer
-    .queryFeatures(query)
-    .then((response: any) => {
-      var stats = response.features[0].attributes;
-      const total_number = stats.total_number;
-      const total_comp = stats.total_comp;
-
-      return [total_number, total_comp];
-    });
-
-  const stcolumn = await stColumnCompile;
-  const stfoundation = await stFoundationCompile;
-  const stframing = await stFramingCompile;
-  const floors = await floorsCompile;
-  const walls = await wallsCompile;
-  const generic = await genericCompile;
-  const rooms = await roomsCompile;
-  const site = await siteCompile;
-  const stairs = await stairsCompile;
-  const stairsRailing = await stairsRailingCompile;
+  const foundation = await foundation_query;
+  const piles = await piles_query;
+  const roof = await roof_query;
+  const beams = await beam_query;
 
   const total =
-    stcolumn[0] +
-    stfoundation[0] +
-    stframing[0] +
-    floors[0] +
-    walls[0] +
-    generic[0] +
-    rooms[0] +
-    site[0] +
-    stairs[0] +
-    stairsRailing[0];
+    foundation[0] +
+    foundation[1] +
+    piles[0] +
+    piles[1] +
+    roof[0] +
+    roof[1] +
+    beams[0] +
+    beams[1];
+  const total_comp = foundation[1] + piles[1] + roof[1] + beams[1];
+  const percent_comp = ((total_comp / total) * 100).toFixed(1);
 
-  const comp =
-    stcolumn[1] +
-    stfoundation[1] +
-    stframing[1] +
-    floors[1] +
-    walls[1] +
-    generic[1] +
-    rooms[1] +
-    site[1] +
-    stairs[1] +
-    stairsRailing[1];
-  const progress = ((comp / total) * 100).toFixed(1);
-  return [total, comp, progress];
+  const data = [
+    {
+      category: buildingLayerCategory_aboveground[0],
+      comp: foundation[1],
+      incomp: foundation[0],
+    },
+    {
+      category: buildingLayerCategory_aboveground[1],
+      comp: piles[1],
+      incomp: piles[0],
+    },
+    {
+      category: buildingLayerCategory_aboveground[2],
+      comp: roof[1],
+      incomp: roof[0],
+    },
+    {
+      category: buildingLayerCategory_aboveground[3],
+      comp: beams[1],
+      incomp: beams[0],
+    },
+  ];
+
+  return [data, total_comp, percent_comp];
 }
 
 // Thousand separators function

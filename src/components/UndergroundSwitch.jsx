@@ -32,6 +32,7 @@ function UndergroundSwitch() {
           paddingBottom: 4,
           borderStyle: "solid",
           borderColor: "gray",
+          borderWidth: 1,
         }}
       >
         Ground: {""}

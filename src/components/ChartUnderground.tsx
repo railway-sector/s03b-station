@@ -10,6 +10,7 @@ import {
   siteLayer,
   stairsLayer,
   stairsRailingLayer,
+  exteriorShellLayer,
 } from "../layers";
 
 import * as am5 from "@amcharts/amcharts5";
@@ -18,10 +19,10 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import am5themes_Responsive from "@amcharts/amcharts5/themes/Responsive";
 import "../App.css";
 import {
-  buildingLayerCategory,
+  buildingLayerCategory_underground,
   construction_status,
-  generateChartData,
-  generateTotalProgress,
+  generateChartDataUnderground,
+  layerFilterForUnderground,
   layerVisibleTrue,
   thousands_separators,
   zoomToLayer,
@@ -40,21 +41,21 @@ function maybeDisposeRoot(divId: any) {
 }
 
 // Draw chart
-const Chart = () => {
+const ChartUnderground = () => {
+  layerFilterForUnderground();
   const arcgisScene = document.querySelector("arcgis-scene") as ArcgisScene;
   const legendRef = useRef<unknown | any | undefined>({});
   const chartRef = useRef<unknown | any | undefined>({});
   const [chartData, setChartData] = useState([]);
-  const [progress, setProgress] = useState([]);
+  const [percentCompleted, setPercentCompleted] = useState([]);
+  const [totalCompleted, setTotalCompleted] = useState([]);
   const chartID = "station-bar";
 
   useEffect(() => {
-    generateChartData().then((response: any) => {
-      setChartData(response);
-    });
-
-    generateTotalProgress().then((response: any) => {
-      setProgress(response);
+    generateChartDataUnderground().then((response: any) => {
+      setChartData(response[0]);
+      setTotalCompleted(response[1]);
+      setPercentCompleted(response[2]);
     });
 
     zoomToLayer(stColumnLayer, arcgisScene);
@@ -74,9 +75,9 @@ const Chart = () => {
   const seriesBulletLabelFontSize = "1vw";
 
   // axis label
-  const yAxisLabelFontSize = "0.8vw";
-  const xAxisLabelFontSize = "0.8vw";
-  const legendFontSize = "0.8vw";
+  const yAxisLabelFontSize = "0.9vw";
+  const xAxisLabelFontSize = "0.9vw";
+  const legendFontSize = "0.85vw";
 
   const chartPaddingRightIconLabel = 10;
 
@@ -247,12 +248,26 @@ const Chart = () => {
       // const stationValue = find?.value;
 
       series.columns.template.events.on("click", (ev) => {
+        layerFilterForUnderground();
         const selected: any = ev.target.dataItem?.dataContext;
         const categorySelect: string = selected.category;
         // const selectedStatus: number | null =
         //   fieldName === 'comp' ? (fieldName === 'incomp' ? 1 : 4) : fieldName === 'delay' ? 3 : 1;
 
-        if (categorySelect === buildingLayerCategory[0]) {
+        if (categorySelect === buildingLayerCategory_underground[0]) {
+          stFoundationLayer.visible = false;
+          stFramingLayer.visible = false;
+          stColumnLayer.visible = false;
+          floorsLayer.visible = false;
+          wallsLayer.visible = false;
+
+          genericLayer.visible = false;
+          roomsLayer.visible = false;
+          siteLayer.visible = true;
+          stairsLayer.visible = false;
+          stairsRailingLayer.visible = false;
+          exteriorShellLayer.visible = false;
+        } else if (categorySelect === buildingLayerCategory_underground[1]) {
           stFoundationLayer.visible = true;
           stFramingLayer.visible = false;
           stColumnLayer.visible = false;
@@ -263,18 +278,8 @@ const Chart = () => {
           siteLayer.visible = false;
           stairsLayer.visible = false;
           stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[1]) {
-          stFoundationLayer.visible = false;
-          stFramingLayer.visible = true;
-          stColumnLayer.visible = false;
-          floorsLayer.visible = false;
-          wallsLayer.visible = false;
-          genericLayer.visible = false;
-          roomsLayer.visible = false;
-          siteLayer.visible = false;
-          stairsLayer.visible = false;
-          stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[2]) {
+          exteriorShellLayer.visible = false;
+        } else if (categorySelect === buildingLayerCategory_underground[2]) {
           stFoundationLayer.visible = false;
           stFramingLayer.visible = false;
           stColumnLayer.visible = true;
@@ -285,39 +290,7 @@ const Chart = () => {
           siteLayer.visible = false;
           stairsLayer.visible = false;
           stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[4]) {
-          stFoundationLayer.visible = false;
-          stFramingLayer.visible = false;
-          stColumnLayer.visible = false;
-          floorsLayer.visible = true;
-          wallsLayer.visible = false;
-          genericLayer.visible = false;
-          roomsLayer.visible = false;
-          siteLayer.visible = false;
-          stairsLayer.visible = false;
-          stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[5]) {
-          stFoundationLayer.visible = false;
-          stFramingLayer.visible = false;
-          stColumnLayer.visible = false;
-          floorsLayer.visible = false;
-          wallsLayer.visible = true;
-          genericLayer.visible = false;
-          roomsLayer.visible = false;
-          siteLayer.visible = false;
-          stairsLayer.visible = false;
-          stairsRailingLayer.visible = false;
-        } else if (categorySelect === buildingLayerCategory[6]) {
-          stFoundationLayer.visible = false;
-          stFramingLayer.visible = false;
-          stColumnLayer.visible = false;
-          floorsLayer.visible = false;
-          wallsLayer.visible = false;
-          genericLayer.visible = false;
-          roomsLayer.visible = true;
-          siteLayer.visible = true;
-          stairsLayer.visible = true;
-          stairsRailingLayer.visible = true;
+          exteriorShellLayer.visible = false;
         }
         arcgisScene?.view.on("click", () => {
           layerVisibleTrue();
@@ -361,7 +334,7 @@ const Chart = () => {
             marginLeft: "30px",
           }}
         >
-          {progress[2]} %
+          {percentCompleted}%
         </div>
 
         <img
@@ -369,7 +342,7 @@ const Chart = () => {
           alt="Utility Logo"
           height={"55px"}
           width={"55px"}
-          style={{ marginLeft: "55%", display: "flex" }}
+          style={{ marginLeft: "45%", display: "flex" }}
         />
       </CalciteLabel>
       <div
@@ -381,7 +354,7 @@ const Chart = () => {
           marginLeft: "30px",
         }}
       >
-        ({thousands_separators(progress[0])})
+        ({thousands_separators(totalCompleted)})
       </div>
 
       <div
@@ -398,4 +371,4 @@ const Chart = () => {
   );
 };
 
-export default Chart;
+export default ChartUnderground;
