@@ -346,12 +346,12 @@ buildingLayer.when(() => {
         layer.visible = true;
         break;
 
-      // case "Overview":
-      //   exteriorShellLayer = layer;
-      //   exteriorShellLayer.visible = false;
-      //   exteriorShellLayer.title = "Exterior Shell";
-      //   exteriorShellLayer.renderer = rendererExteriorShell;
-      //   break;
+      case "Overview":
+        exteriorShellLayer = layer;
+        exteriorShellLayer.visible = false;
+        exteriorShellLayer.title = "Exterior Shell";
+        exteriorShellLayer.renderer = rendererNotMonitoring;
+        break;
 
       case "Floors":
         floorsLayer = layer;
@@ -434,7 +434,7 @@ buildingLayer.when(() => {
         break;
 
       default:
-        layer.visible = true;
+        layer.visible = false;
     }
   });
 });
