@@ -66,11 +66,11 @@ export const layerFilterForUnderground = () => {
   stFramingLayer.definitionExpression = "Component = 'UG'";
   floorsLayer.definitionExpression = "Component = 'UG'";
   wallsLayer.definitionExpression = "Component = 'UG'";
-  roomsLayer.definitionExpression = "Component = 'UG'";
+  // roomsLayer.definitionExpression = "Component = 'UG'";
   siteLayer.definitionExpression = "Component = 'UG'";
-  stairsLayer.definitionExpression = "Component = 'UG'";
-  stairsRailingLayer.definitionExpression = "Component = 'UG'";
-  genericLayer.definitionExpression = "Component = 'UG'";
+  // stairsLayer.definitionExpression = "Component = 'UG'";
+  // stairsRailingLayer.definitionExpression = "Component = 'UG'";
+  // genericLayer.definitionExpression = "Component = 'UG'";
 };
 
 export const layerFilterForAboveground = () => {
@@ -79,11 +79,11 @@ export const layerFilterForAboveground = () => {
   stFramingLayer.definitionExpression = "Component = 'ATG'";
   floorsLayer.definitionExpression = "Component = 'ATG'";
   wallsLayer.definitionExpression = "Component = 'ATG'";
-  roomsLayer.definitionExpression = "Component = 'ATG'";
+  // roomsLayer.definitionExpression = "Component = 'ATG'";
   siteLayer.definitionExpression = "Component = 'ATG'";
-  stairsLayer.definitionExpression = "Component = 'ATG'";
-  stairsRailingLayer.definitionExpression = "Component = 'ATG'";
-  genericLayer.definitionExpression = "Component = 'ATG'";
+  // stairsLayer.definitionExpression = "Component = 'ATG'";
+  // stairsRailingLayer.definitionExpression = "Component = 'ATG'";
+  // genericLayer.definitionExpression = "Component = 'ATG'";
 };
 
 export const layerVisibleTrue = () => {
@@ -92,11 +92,11 @@ export const layerVisibleTrue = () => {
   stFramingLayer.visible = true;
   floorsLayer.visible = true;
   wallsLayer.visible = true;
-  roomsLayer.visible = true;
+  // roomsLayer.visible = true;
   siteLayer.visible = true;
-  stairsLayer.visible = true;
-  stairsRailingLayer.visible = true;
-  genericLayer.visible = true;
+  // stairsLayer.visible = true;
+  // stairsRailingLayer.visible = true;
+  // genericLayer.visible = true;
   buildingLayer.visible = true;
 };
 
@@ -168,7 +168,7 @@ export async function generateChartDataUnderground() {
   siteLayer.definitionExpression = queryExpression;
 
   query.where = queryExpression;
-  layerVisibleTrue();
+  // layerVisibleTrue();
 
   const dwall_query = siteLayer.queryFeatures(query).then((response: any) => {
     var stats = response.features[0].attributes;
@@ -311,7 +311,7 @@ export async function generateChartDataAboveground() {
   siteLayer.definitionExpression = queryExpression;
 
   query.where = queryExpression;
-  layerVisibleTrue();
+  // layerVisibleTrue();
 
   const foundation_query = stFoundationLayer
     .queryFeatures(query)

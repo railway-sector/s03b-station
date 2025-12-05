@@ -261,36 +261,35 @@ const ChartUnderground = () => {
           floorsLayer.visible = false;
           wallsLayer.visible = false;
 
-          genericLayer.visible = false;
-          roomsLayer.visible = false;
+          // genericLayer.visible = false;
+          // roomsLayer.visible = false;
           siteLayer.visible = true;
-          stairsLayer.visible = false;
-          stairsRailingLayer.visible = false;
-          exteriorShellLayer.visible = false;
+          // stairsLayer.visible = false;
+          // stairsRailingLayer.visible = false;
+          // exteriorShellLayer.visible = false;
         } else if (categorySelect === buildingLayerCategory_underground[1]) {
           stFoundationLayer.visible = true;
           stFramingLayer.visible = false;
           stColumnLayer.visible = false;
           floorsLayer.visible = false;
           wallsLayer.visible = false;
-          genericLayer.visible = false;
-          roomsLayer.visible = false;
+          // roomsLayer.visible = false;
           siteLayer.visible = false;
-          stairsLayer.visible = false;
-          stairsRailingLayer.visible = false;
-          exteriorShellLayer.visible = false;
+          // stairsLayer.visible = false;
+          // stairsRailingLayer.visible = false;
+          // exteriorShellLayer.visible = false;
         } else if (categorySelect === buildingLayerCategory_underground[2]) {
           stFoundationLayer.visible = false;
           stFramingLayer.visible = false;
           stColumnLayer.visible = true;
           floorsLayer.visible = false;
           wallsLayer.visible = false;
-          genericLayer.visible = false;
-          roomsLayer.visible = false;
+          // genericLayer.visible = false;
+          // roomsLayer.visible = false;
           siteLayer.visible = false;
-          stairsLayer.visible = false;
-          stairsRailingLayer.visible = false;
-          exteriorShellLayer.visible = false;
+          // stairsLayer.visible = false;
+          // stairsRailingLayer.visible = false;
+          // exteriorShellLayer.visible = false;
         }
         arcgisScene?.view.on("click", () => {
           layerVisibleTrue();

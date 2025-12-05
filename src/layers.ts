@@ -240,6 +240,10 @@ export const popuTemplate = {
           fieldName: "t02__End_Date",
           label: "End Date",
         },
+        {
+          fieldName: "DocName",
+          label: "DocName",
+        },
       ],
     },
   ],
@@ -252,16 +256,16 @@ const colorStatus = [
   [0, 112, 255, 0.8], // Completed
 ];
 
-const rendererExteriorShell = new SimpleRenderer({
+const rendererNotMonitoring = new SimpleRenderer({
   symbol: new MeshSymbol3D({
     symbolLayers: [
       new FillSymbol3DLayer({
         material: {
-          color: [235, 236, 240, 0],
+          color: [255, 255, 155, 0.7],
           colorMixMode: "replace",
         },
         edges: new SolidEdges3D({
-          color: [225, 225, 225, 0.3],
+          color: [255, 255, 155, 0.3],
         }),
       }),
     ],
@@ -270,6 +274,19 @@ const rendererExteriorShell = new SimpleRenderer({
 
 const renderer = new UniqueValueRenderer({
   field: "Status",
+  // defaultSymbol: new MeshSymbol3D({
+  //   symbolLayers: [
+  //     new FillSymbol3DLayer({
+  //       material: {
+  //         color: [225, 225, 225, 0],
+  //         colorMixMode: "replace",
+  //       },
+  //       edges: new SolidEdges3D({
+  //         color: [225, 225, 225, 0],
+  //       }),
+  //     }),
+  //   ],
+  // }),
   uniqueValueInfos: [
     {
       value: 1,
@@ -329,12 +346,12 @@ buildingLayer.when(() => {
         layer.visible = true;
         break;
 
-      case "Overview":
-        exteriorShellLayer = layer;
-        exteriorShellLayer.visible = false;
-        exteriorShellLayer.title = "Exterior Shell";
-        exteriorShellLayer.renderer = rendererExteriorShell;
-        break;
+      // case "Overview":
+      //   exteriorShellLayer = layer;
+      //   exteriorShellLayer.visible = false;
+      //   exteriorShellLayer.title = "Exterior Shell";
+      //   exteriorShellLayer.renderer = rendererExteriorShell;
+      //   break;
 
       case "Floors":
         floorsLayer = layer;
@@ -357,7 +374,7 @@ buildingLayer.when(() => {
         genericLayer = layer;
         genericLayer.popupTemplate = popuTemplate;
         genericLayer.title = "GenericModel";
-        genericLayer.renderer = renderer;
+        genericLayer.renderer = rendererNotMonitoring;
         break;
 
       case "Rooms":
@@ -365,7 +382,7 @@ buildingLayer.when(() => {
         roomsLayer.popupTemplate = popuTemplate;
         roomsLayer.title = "Rooms";
         roomsLayer.definitionExpression = "Component = 'UG'";
-        roomsLayer.renderer = renderer;
+        roomsLayer.renderer = rendererNotMonitoring;
         break;
 
       case "Site":
@@ -381,7 +398,7 @@ buildingLayer.when(() => {
         stairsLayer.popupTemplate = popuTemplate;
         stairsLayer.title = "Stairs";
         stairsLayer.definitionExpression = "Component = 'UG'";
-        stairsLayer.renderer = renderer;
+        stairsLayer.renderer = rendererNotMonitoring;
         break;
 
       case "StairsRailing":
@@ -389,7 +406,7 @@ buildingLayer.when(() => {
         stairsRailingLayer.popupTemplate = popuTemplate;
         stairsRailingLayer.title = "StairsRailing";
         stairsRailingLayer.definitionExpression = "Component = 'UG'";
-        stairsRailingLayer.renderer = renderer;
+        stairsRailingLayer.renderer = rendererNotMonitoring;
         break;
 
       case "StructuralFraming":

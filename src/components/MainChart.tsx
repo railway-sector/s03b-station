@@ -2,10 +2,8 @@ import "@esri/calcite-components/dist/components/calcite-tabs";
 import "@esri/calcite-components/dist/components/calcite-tab";
 import "@esri/calcite-components/dist/components/calcite-tab-nav";
 import "@esri/calcite-components/dist/components/calcite-tab-title";
-import "@esri/calcite-components/dist/components/calcite-panel";
 import "@esri/calcite-components/dist/calcite/calcite.css";
 import {
-  CalcitePanel,
   CalciteTab,
   CalciteTabs,
   CalciteTabNav,
@@ -36,6 +34,7 @@ function MainChart() {
   useEffect(() => {
     if (buildingLayerLoaded === "loaded") {
       if (chartTabName === "Underground") {
+        console.log(chartTabName);
         layerFilterForUnderground();
       } else if (chartTabName === "Aboveground") {
         layerFilterForAboveground();
