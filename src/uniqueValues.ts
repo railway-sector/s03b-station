@@ -47,6 +47,15 @@ export const chartCategoryTypeField = "Types";
 export const statusField = "Status";
 export const statusStateValues = [1, 2, 3, 4];
 
+export const statusLabels = ["incomp", "ongoing", "delayed", "comp"];
+export const statusValues = [1, 2, 3, 4];
+export const statusArray = statusLabels.map((status: any, index: any) => {
+  return Object.assign({
+    status: status,
+    value: statusValues[index],
+  });
+});
+
 //------------------------------//
 //    Underground structures    //
 //------------------------------//

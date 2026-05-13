@@ -129,7 +129,8 @@ interface clickSerisType {
   sublayersCollection: any;
   chartCategoryTypes: any;
   chartCategoryFieldRevit: any;
-  statusStateValue: any;
+  statusStatename: any;
+  statusArray: any;
   statusField: any;
   arcgisScene: any;
   setSublayerViewFilter: any; // useState
@@ -143,7 +144,8 @@ export function clickSeries({
   sublayersCollection,
   chartCategoryTypes,
   chartCategoryFieldRevit,
-  statusStateValue,
+  statusStatename,
+  statusArray,
   statusField,
   arcgisScene,
   setSublayerViewFilter, // useState
@@ -161,7 +163,9 @@ export function clickSeries({
     queryc.qFields = [q1Field];
     queryc.chartCategory = typeSelected;
     queryc.chartCategoryField = chartCategoryFieldRevit;
-    queryc.status = statusStateValue;
+    queryc.status = statusArray.find(
+      (item: any) => item.status === statusStatename,
+    ).value;
     queryc.statusField = statusField;
 
     //--- Find sublayer
@@ -196,7 +200,7 @@ interface makeSerisType {
   chartCategoryFieldRevit: any;
   statusTypename: any;
   statusStatename: any;
-  statusStateValue: any;
+  statusArray: any;
   statusField: any;
   xAxis: any;
   yAxis: any;
@@ -221,7 +225,7 @@ export function makeSeries({
   chartCategoryFieldRevit,
   statusTypename,
   statusStatename,
-  statusStateValue,
+  statusArray,
   statusField,
   xAxis,
   yAxis,
@@ -292,7 +296,8 @@ export function makeSeries({
     sublayersCollection: sublayersCollection,
     chartCategoryTypes: chartCategoryTypes,
     chartCategoryFieldRevit: chartCategoryFieldRevit,
-    statusStateValue: statusStateValue,
+    statusStatename: statusStatename,
+    statusArray: statusArray,
     statusField: statusField,
     arcgisScene: arcgisScene,
     setSublayerViewFilter: setSublayerViewFilter,
@@ -316,7 +321,7 @@ interface chartType {
   // 'statusTypename' and 'statusStatename': E.g., you can add or delete status you wish to add in stacked columns.
   statusTypename: StatusTypenamesType[]; // order has no effect on statistics
   statusStatename: StatusStateType[]; // order affects the order displayed in stacked column charts
-  statusStateValue?: any;
+  statusArray: any;
   statusField: any;
   seriesStatusColor: any;
   strokeColor: any;
@@ -343,7 +348,7 @@ export function chartRenderer({
   chartCategoryFieldRevit,
   statusTypename,
   statusStatename,
-  statusStateValue,
+  statusArray,
   statusField,
   seriesStatusColor,
   strokeColor,
@@ -447,7 +452,7 @@ export function chartRenderer({
         chartCategoryFieldRevit: chartCategoryFieldRevit,
         statusTypename: statustype,
         statusStatename: statusStatename[index],
-        statusStateValue: statusStateValue[index],
+        statusArray: statusArray,
         statusField: statusField,
         xAxis: xAxis,
         yAxis: yAxis,

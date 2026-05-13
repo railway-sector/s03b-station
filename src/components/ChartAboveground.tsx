@@ -13,6 +13,7 @@ import {
   buildingTypes_a,
   chart_colors,
   chartCategoryTypeField,
+  statusArray,
   statusField,
   structureLocationField,
 } from "../uniqueValues";
@@ -154,7 +155,7 @@ export default function ChartAboveground() {
       chartCategoryFieldRevit: chartCategoryTypeField,
       statusTypename: ["Completed", "To be Constructed"],
       statusStatename: ["comp", "incomp"],
-      statusStateValue: [4, 1],
+      statusArray: statusArray,
       statusField: statusField,
       seriesStatusColor: chart_colors,
       strokeColor: chartBorderLineColor,
