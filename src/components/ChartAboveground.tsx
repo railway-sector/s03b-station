@@ -64,8 +64,8 @@ export default function ChartAboveground() {
     chartDataStackColumns({
       layers: sublayersArray,
       chartCategoryTypes: buildingTypes_a,
-      chartCategoryField: chartCategoryTypeField,
-      chartCategoryValueType: "string",
+      chartCategoryTypeField: chartCategoryTypeField,
+      // chartCategoryValueType: "string",
       statusState: [1, 2, 3, 4],
       statusField: statusField,
       qChart: queryc2.queryExpression(),

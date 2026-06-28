@@ -84,6 +84,7 @@ export async function defineActions(event: any) {
   item.title === "Exterior Shell" ||
   item.title === "GenericModel" ||
   item.title === "Rooms (not monitoring)" ||
+  item.title === "Walls (not monitoring)" ||
   item.title === "StairsRailing (not monitoring)" ||
   item.title === "Stairs (not monitoring)"
     ? // item.title === "Walls (not monitoring)"

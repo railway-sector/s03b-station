@@ -379,10 +379,10 @@ buildingLayer.when(() => {
         wallsLayer.popupTemplate = popupTemplate;
         wallsLayer.title = "Walls (not monitoring)";
         wallsLayer.renderer = rendererNotMonitoring;
-        sublayersAll.push({
-          name: layer.modelName,
-          layer: layer,
-        });
+        // sublayersAll.push({
+        //   name: layer.modelName,
+        //   layer: layer,
+        // });
         break;
 
       case "GenericModel":
