@@ -22,13 +22,7 @@ export function App(): React.JSX.Element {
     authenticate(setLoggedInState, "hNWIzMYMdl2VFCDH");
   }, []);
 
-  const [chartPanelwidth, setChartPanelwidth] = useState<any>();
   const [chartPanelTabName, setChartPanelTabName] = useState<any>("UG");
-
-  const updateChartPanelwidth = (newWidth: any) => {
-    setChartPanelwidth(newWidth);
-  };
-
   const updateChartPanelTabName = (newTab: any) => {
     setChartPanelTabName(newTab);
   };
@@ -37,14 +31,7 @@ export function App(): React.JSX.Element {
     <>
       {loggedInState && (
         <calcite-shell>
-          <MyContext
-            value={{
-              chartPanelwidth,
-              chartPanelTabName,
-              updateChartPanelwidth,
-              updateChartPanelTabName,
-            }}
-          >
+          <MyContext value={{ chartPanelTabName, updateChartPanelTabName }}>
             <QueryClientProvider client={queryClient}>
               <ActionPanel />
               <UndergroundSwitch />
