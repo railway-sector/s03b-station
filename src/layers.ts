@@ -37,8 +37,8 @@ export const chartstack_a = new ChartStackColumns(
 );
 
 export const queryc = new QueryExpressionLayers(
-  undefined,
-  undefined,
+  [undefined],
+  [undefined],
   undefined,
   undefined,
   "string",
@@ -49,8 +49,8 @@ export const queryc = new QueryExpressionLayers(
 );
 
 export const queryc2 = new QueryExpressionLayers(
-  undefined,
-  undefined,
+  [undefined],
+  [undefined],
   undefined,
   undefined,
   "string",
