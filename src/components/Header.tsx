@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { dateUpdate } from "../Query";
+import { dateUpdate } from "../query";
 
 function Header() {
   const [asOfDate, setAsOfDate] = useState(null);

@@ -1,10 +1,7 @@
 import { buildingLayer, queryc } from "./layers";
-
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import FeatureFilter from "@arcgis/core/layers/support/FeatureFilter";
 import BuildingComponentSublayer from "@arcgis/core/layers/buildingSublayers/BuildingComponentSublayer.js";
-// import { sublayerNames, viaSublayerTypes } from "./uniqueValues";
-
 import type { StatusStateType } from "./uniqueValues";
 import type { StatusTypenamesType } from "./uniqueValues";
 import * as am5 from "@amcharts/amcharts5";
@@ -12,9 +9,6 @@ import * as am5xy from "@amcharts/amcharts5/xy";
 import type BuildingSceneLayer from "@arcgis/core/layers/BuildingSceneLayer";
 import type SceneLayer from "@arcgis/core/layers/SceneLayer";
 
-// ****************************
-//    Chart Parameters
-// ****************************
 //-- Responsve parameters
 export function responsiveChart(chart: any, legend: any) {
   chart.onPrivate("width", (width: any) => {

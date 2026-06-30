@@ -9,7 +9,7 @@ import "@arcgis/map-components/components/arcgis-basemap-gallery";
 import "@arcgis/map-components/components/arcgis-layer-list";
 import "@arcgis/map-components/components/arcgis-legend";
 import "@arcgis/map-components/components/arcgis-direct-line-measurement-3d";
-import { defineActions } from "../Query";
+import { defineActions } from "../query";
 import { buildingLayer } from "../layers";
 
 function ActionPanel() {
@@ -49,9 +49,7 @@ function ActionPanel() {
       actionActiveWidget.hidden = true;
       shellPanel.collapsed = true;
 
-      directLineMeasure
-        ? directLineMeasure.clear()
-        : console.log("Line measure is cleared");
+      directLineMeasure && directLineMeasure.clear();
     }
 
     if (nextWidget !== activeWidget) {

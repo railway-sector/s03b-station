@@ -15,7 +15,26 @@ import SolidEdges3D from "@arcgis/core/symbols/edges/SolidEdges3D";
 import CustomContent from "@arcgis/core/popup/content/CustomContent";
 import PopupTemplate from "@arcgis/core/PopupTemplate";
 import QueryExpressionLayers from "query-layers-expression";
-import { statusStateValues } from "./uniqueValues";
+import { status_field, statusStateValues } from "./uniqueValues";
+import ChartStackColumns from "chart-stack-column";
+
+export const chartstack_u = new ChartStackColumns(
+  undefined, // qChart
+  undefined, // categoryTypes
+  undefined, // categoryTypeField
+  undefined, // layers
+  status_field, // status field
+  undefined, // statusState
+);
+
+export const chartstack_a = new ChartStackColumns(
+  undefined, // qChart
+  undefined, // categoryTypes
+  undefined, // categoryTypeField
+  undefined, // layers
+  status_field, // status field
+  undefined, // statusState
+);
 
 export const queryc = new QueryExpressionLayers(
   undefined,

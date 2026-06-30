@@ -1,14 +1,10 @@
 import { use, useEffect, useRef, useState } from "react";
-import { stColumnLayer, sublayersAll, queryc2 } from "../layers";
-
+import { stColumnLayer, sublayersAll, queryc2, chartstack_a } from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
-import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
-import am5themes_Responsive from "@amcharts/amcharts5/themes/Responsive";
-import { thousands_separators, zoomToLayer } from "../Query";
+import { thousands_separators, zoomToLayer } from "../query";
 import "@esri/calcite-components/dist/components/calcite-label";
 import { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
-import { chartDataStackColumns } from "../ChartDataGenerator";
 import {
   buildingTypes_a,
   chart_colors,
@@ -17,32 +13,21 @@ import {
   statusField,
   structureLocationField,
 } from "../uniqueValues";
-import { chartRenderer, resetAllLayers } from "../ChartRenderer";
+import { chartRenderer, resetAllLayers } from "../chartRenderer";
 import SubLayerView from "@arcgis/core/views/layers/BuildingComponentSublayerView";
 import { MyContext } from "../contexts/MyContext";
 import FeatureFilter from "@arcgis/core/layers/support/FeatureFilter";
-import { queryDefinitionExpression } from "../QueryExpression";
-
-// Dispose function
-function maybeDisposeRoot(divId: any) {
-  am5.array.each(am5.registry.rootElements, function (root) {
-    if (root.dom.id === divId) {
-      root.dispose();
-    }
-  });
-}
+import { queryDefinitionExpression } from "../queryExpression";
+import { useQuery } from "@tanstack/react-query";
+import { legendSetter, rootSetter } from "../chartSetter";
 
 // Draw chart
 export default function ChartAboveground() {
-  const { updateChartPanelwidth, chartPanelwidth, chartPanelTabName } =
-    use(MyContext);
+  const { chartPanelTabName } = use(MyContext);
+  const [chartPanelwidth, setChartPanelwidth] = useState<any>();
   const arcgisScene = document.querySelector("arcgis-scene") as ArcgisScene;
   const legendRef = useRef<unknown | any | undefined>({});
   const chartRef = useRef<unknown | any | undefined>({});
-
-  const [chartData, setChartData] = useState<any>([]);
-  const [percentCompleted, setPercentCompleted] = useState<number>(0);
-  const [totalCompleted, setTotalCompleted] = useState<number>(0);
   const [sublayerViewFilter, setSublayerViewFilter] = useState<
     SubLayerView | any
   >();
@@ -50,33 +35,39 @@ export default function ChartAboveground() {
   const [resetButtonClicked, setResetButtonClicked] = useState<boolean>(false);
   const chartID = "stack-bar2";
 
-  useEffect(() => {
-    const sublayersArray = sublayersAll.map((item: any) => item.layer);
+  const { data } = useQuery<any>({
+    queryKey: [chartPanelTabName, chartCategoryTypeField],
+    queryFn: async () => {
+      const sublayersArray = sublayersAll.map((item: any) => item.layer);
 
-    queryc2.qValues = [chartPanelTabName];
-    queryc2.qFields = [structureLocationField];
+      queryc2.qValues = [chartPanelTabName];
+      queryc2.qFields = [structureLocationField];
 
-    queryDefinitionExpression({
-      queryExpression: queryc2.queryExpression(),
-      featureLayer: sublayersArray,
-    });
+      queryDefinitionExpression({
+        queryExpression: queryc2.queryExpression(),
+        featureLayer: sublayersArray,
+      });
 
-    chartDataStackColumns({
-      layers: sublayersArray,
-      chartCategoryTypes: buildingTypes_a,
-      chartCategoryTypeField: chartCategoryTypeField,
-      // chartCategoryValueType: "string",
-      statusState: [1, 2, 3, 4],
-      statusField: statusField,
-      qChart: queryc2.queryExpression(),
-    }).then((response: any) => {
-      setChartData(response[0]);
-      setTotalCompleted(response[1]);
-      setPercentCompleted(response[2]);
-    });
+      chartstack_a.qChart = queryc2.queryExpression();
+      chartstack_a.layers = sublayersArray;
+      chartstack_a.categoryTypes = buildingTypes_a;
+      chartstack_a.categoryTypeField = chartCategoryTypeField;
+      chartstack_a.statusState = [1, 2, 3, 4];
+      const chartData = await chartstack_a.chartDataStackColumns();
 
-    zoomToLayer(stColumnLayer, arcgisScene);
-  }, []);
+      zoomToLayer(stColumnLayer, arcgisScene);
+
+      return {
+        chartData: chartData[0] || [],
+        totaln: chartData[1] || 0,
+        perc: chartData[2] || 0,
+      };
+    },
+    staleTime: Infinity,
+  });
+  const chartData = data?.chartData || [];
+  const totaln = data?.totaln || 0;
+  const perc_comp = data?.perc || 0;
 
   // Define parameters
   const marginTop = 0;
@@ -101,17 +92,7 @@ export default function ChartAboveground() {
   const new_imageSize = chartPanelwidth * 0.035;
 
   useEffect(() => {
-    maybeDisposeRoot(chartID);
-
-    const root = am5.Root.new(chartID);
-    root.container.children.clear();
-    root._logo?.dispose();
-
-    // Set themesf
-    root.setThemes([
-      am5themes_Animated.new(root),
-      am5themes_Responsive.new(root),
-    ]);
+    const root = rootSetter({ chartID: chartID });
 
     const chart = root.container.children.push(
       am5xy.XYChart.new(root, {
@@ -132,17 +113,17 @@ export default function ChartAboveground() {
     );
     chartRef.current = chart;
 
-    const legend = chart.children.push(
-      am5.Legend.new(root, {
-        centerX: am5.p50,
-        centerY: am5.percent(50),
-        x: am5.percent(60),
-        y: am5.percent(97),
-        marginTop: 20,
-        scale: 0.9,
-        layout: root.horizontalLayout,
-      }),
-    );
+    const legend = legendSetter({
+      chart: chart,
+      root: root,
+      centerX: 50,
+      centerY: 50,
+      x: 60,
+      y: 97,
+      marginTop: 20,
+      scale: 0.9,
+      layout: root.horizontalLayout,
+    });
     legendRef.current = legend;
 
     chartRenderer({
@@ -168,7 +149,7 @@ export default function ChartAboveground() {
       new_chartIconSize: new_chartIconSize,
       new_axisFontSize: new_axisFontSize,
       legend: legend,
-      updateChartPanelwidth: updateChartPanelwidth,
+      updateChartPanelwidth: setChartPanelwidth,
     });
 
     chart.appear(1000, 100);
@@ -237,7 +218,7 @@ export default function ChartAboveground() {
               margin: "auto",
             }}
           >
-            {percentCompleted} %
+            {perc_comp} %
           </dd>
           <div
             style={{
@@ -247,7 +228,7 @@ export default function ChartAboveground() {
               lineHeight: "1.2",
             }}
           >
-            ({thousands_separators(totalCompleted)})
+            ({thousands_separators(totaln)})
           </div>
         </dl>
       </div>
