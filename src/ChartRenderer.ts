@@ -1,4 +1,4 @@
-import { buildingLayer, queryc } from "./layers";
+import { buildingLayer } from "./layers";
 import FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 import FeatureFilter from "@arcgis/core/layers/support/FeatureFilter";
 import BuildingComponentSublayer from "@arcgis/core/layers/buildingSublayers/BuildingComponentSublayer.js";
@@ -33,7 +33,7 @@ interface layerViewQueryType {
   sublayersCollection?: any;
   chartCategoryTypes?: any;
   categorySelected?: any;
-  qExpression?: any;
+  qChart?: any;
   sublayerNames?: any;
   view: any;
   setLayerViewFilter?: any;
@@ -74,12 +74,13 @@ export const highlightFilterBuildingSublayerView = ({
   sublayersCollection,
   chartCategoryTypes,
   categorySelected,
-  qExpression,
+  qChart,
   sublayerNames,
   view,
   setLayerViewFilter, // useState
   highlightedSublayerView,
 }: layerViewQueryType) => {
+  const qe = qChart.queryExpression();
   view?.whenLayerView(layer).then((layerView: any) => {
     //--- Create sublayerview
     const sublayerView = layerView.sublayerViews.find((sublayerView: any) => {
@@ -96,7 +97,7 @@ export const highlightFilterBuildingSublayerView = ({
       sublayersCollection,
       chartCategoryTypes,
       categorySelected,
-      qExpression,
+      qe,
     );
 
     if (sublayerView) {
@@ -107,7 +108,7 @@ export const highlightFilterBuildingSublayerView = ({
       });
     } else {
       sublayerView.filter = new FeatureFilter({
-        where: qExpression,
+        where: qe,
       });
       highlightedSublayerView.current &&
         highlightedSublayerView.current.remove();
@@ -118,8 +119,7 @@ export const highlightFilterBuildingSublayerView = ({
 //--- Click event on series
 interface clickSerisType {
   series: any;
-  q1Value?: any;
-  q1Field?: any;
+  qChart: any;
   sublayersCollection: any;
   chartCategoryTypes: any;
   chartCategoryFieldRevit: any;
@@ -133,8 +133,7 @@ interface clickSerisType {
 
 export function clickSeries({
   series,
-  q1Value,
-  q1Field,
+  qChart,
   sublayersCollection,
   chartCategoryTypes,
   chartCategoryFieldRevit,
@@ -153,14 +152,12 @@ export function clickSeries({
     );
     const typeSelected = find?.value;
 
-    queryc.qValues = [q1Value];
-    queryc.qFields = [q1Field];
-    queryc.chartCategory = typeSelected;
-    queryc.chartCategoryField = chartCategoryFieldRevit;
-    queryc.status = statusArray.find(
+    qChart.chartCategory = typeSelected;
+    qChart.chartCategoryField = chartCategoryFieldRevit;
+    qChart.status = statusArray.find(
       (item: any) => item.status === statusStatename,
     ).value;
-    queryc.statusField = statusField;
+    qChart.statusField = statusField;
 
     //--- Find sublayer
     const selectedSublayerName = chartCategoryTypes.find(
@@ -174,7 +171,7 @@ export function clickSeries({
       sublayersCollection: sublayersCollection,
       chartCategoryTypes: chartCategoryTypes,
       categorySelected: categorySelected,
-      qExpression: queryc.queryExpression(),
+      qChart: qChart,
       sublayerNames: selectedSublayerName,
       view: arcgisScene?.view,
       setLayerViewFilter: setSublayerViewFilter,
@@ -188,8 +185,7 @@ interface makeSerisType {
   root: any;
   chart: any;
   data: any;
-  q1Value?: any;
-  q1Field?: any;
+  qChart: any;
   chartCategoryTypes: any;
   chartCategoryFieldRevit: any;
   statusTypename: any;
@@ -213,8 +209,7 @@ export function makeSeries({
   root,
   chart,
   data,
-  q1Value,
-  q1Field,
+  qChart,
   chartCategoryTypes,
   chartCategoryFieldRevit,
   statusTypename,
@@ -285,8 +280,7 @@ export function makeSeries({
   // Click series
   clickSeries({
     series: series,
-    q1Value: q1Value,
-    q1Field: q1Field,
+    qChart: qChart,
     sublayersCollection: sublayersCollection,
     chartCategoryTypes: chartCategoryTypes,
     chartCategoryFieldRevit: chartCategoryFieldRevit,
@@ -307,8 +301,7 @@ interface chartType {
   chart: any;
   data: any;
   sublayersCollection: any;
-  q1Value?: any;
-  q1Field?: any;
+  qChart: any;
   chartCategoryTypes?: any;
   chartCategoryFieldRevit?: any;
   chartCategoryFieldScene?: any;
@@ -335,8 +328,7 @@ export function chartRenderer({
   root,
   chart,
   data,
-  q1Value,
-  q1Field,
+  qChart,
   sublayersCollection,
   chartCategoryTypes,
   chartCategoryFieldRevit,
@@ -440,8 +432,7 @@ export function chartRenderer({
         root: root,
         chart: chart,
         data: data,
-        q1Value: q1Value,
-        q1Field: q1Field,
+        qChart: qChart,
         chartCategoryTypes: chartCategoryTypes,
         chartCategoryFieldRevit: chartCategoryFieldRevit,
         statusTypename: statustype,

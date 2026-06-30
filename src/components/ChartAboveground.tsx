@@ -1,5 +1,5 @@
 import { use, useEffect, useRef, useState } from "react";
-import { stColumnLayer, sublayersAll, queryc2, chartstack_a } from "../layers";
+import { stColumnLayer, sublayersAll, chartstack_a, queryc } from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
 import { thousands_separators, zoomToLayer } from "../query";
@@ -40,15 +40,15 @@ export default function ChartAboveground() {
     queryFn: async () => {
       const sublayersArray = sublayersAll.map((item: any) => item.layer);
 
-      queryc2.qValues = [chartPanelTabName];
-      queryc2.qFields = [structureLocationField];
+      queryc.qValues = [chartPanelTabName];
+      queryc.qFields = [structureLocationField];
 
       queryDefinitionExpression({
-        queryExpression: queryc2.queryExpression(),
+        queryExpression: queryc.queryExpression(),
         featureLayer: sublayersArray,
       });
 
-      chartstack_a.qChart = queryc2.queryExpression();
+      chartstack_a.qChart = queryc.queryExpression();
       chartstack_a.layers = sublayersArray;
       chartstack_a.categoryTypes = buildingTypes_a;
       chartstack_a.categoryTypeField = chartCategoryTypeField;
@@ -130,8 +130,7 @@ export default function ChartAboveground() {
       root: root,
       chart: chart,
       data: chartData,
-      q1Value: chartPanelTabName,
-      q1Field: structureLocationField,
+      qChart: queryc,
       chartCategoryTypes: buildingTypes_a,
       chartCategoryFieldRevit: chartCategoryTypeField,
       statusTypename: ["Completed", "To be Constructed"],
