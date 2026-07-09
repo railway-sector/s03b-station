@@ -1,8 +1,14 @@
 import { use, useEffect, useRef, useState } from "react";
-import { stColumnLayer, sublayersAll, chartstack_a, queryc } from "../layers";
+import {
+  stColumnLayer,
+  sublayersAll,
+  chartstack_a,
+  queryc,
+  buildingLayer,
+} from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
-import { thousands_separators, zoomToLayer } from "../query";
+import { resetAllLayers, thousands_separators, zoomToLayer } from "../query";
 import "@esri/calcite-components/dist/components/calcite-label";
 import { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
 import {
@@ -13,13 +19,14 @@ import {
   statusField,
   structureLocationField,
 } from "../uniqueValues";
-import { chartRenderer, resetAllLayers } from "../chartRenderer";
+
 import SubLayerView from "@arcgis/core/views/layers/BuildingComponentSublayerView";
 import { MyContext } from "../contexts/MyContext";
 import FeatureFilter from "@arcgis/core/layers/support/FeatureFilter";
 import { queryDefinitionExpression } from "../queryExpression";
 import { useQuery } from "@tanstack/react-query";
 import { legendSetter, rootSetter } from "../chartSetter";
+import ChartStackColumnRender from "chart-stack-column-render";
 
 // Draw chart
 export default function ChartAboveground() {
@@ -80,7 +87,7 @@ export default function ChartAboveground() {
   const paddingBottom = 0;
   const chartBorderLineColor = "#00c5ff";
   const chartBorderLineWidth = 0.4;
-  const chartPaddingRightIconLabelSpace = 10;
+  const chartPaddingRightIconLabel = 10;
 
   //-------------------------------------//
   //    Responsive Chart parameters      //
@@ -126,30 +133,34 @@ export default function ChartAboveground() {
     });
     legendRef.current = legend;
 
-    chartRenderer({
-      root: root,
-      chart: chart,
-      data: chartData,
-      qChart: queryc,
-      chartCategoryTypes: buildingTypes_a,
-      chartCategoryFieldRevit: chartCategoryTypeField,
-      statusTypename: ["Completed", "To be Constructed"],
-      statusStatename: ["comp", "incomp"],
-      statusArray: statusArray,
-      statusField: statusField,
-      seriesStatusColor: chart_colors,
-      strokeColor: chartBorderLineColor,
-      strokeWidth: chartBorderLineWidth,
-      arcgisScene: arcgisScene,
-      setSublayerViewFilter: setSublayerViewFilter,
-      sublayersCollection: sublayersAll,
-      highlightedSublayerView: highlightedSublayerView,
-      chartPaddingRightIconLabelSpace: chartPaddingRightIconLabelSpace,
-      new_chartIconSize: new_chartIconSize,
-      new_axisFontSize: new_axisFontSize,
-      legend: legend,
-      updateChartPanelwidth: setChartPanelwidth,
-    });
+    const crender = new ChartStackColumnRender(
+      true,
+      sublayersAll,
+      root,
+      chart,
+      chartData,
+      buildingLayer,
+      queryc,
+      buildingTypes_a,
+      chartCategoryTypeField,
+      ["Completed", "To be Constructed"],
+      ["comp", "incomp"],
+      statusArray,
+      statusField,
+      chart_colors,
+      chartBorderLineColor,
+      chartBorderLineWidth,
+      arcgisScene?.view,
+      setSublayerViewFilter,
+      new_chartIconSize,
+      new_axisFontSize,
+      undefined,
+      chartPaddingRightIconLabel,
+      legend,
+      setChartPanelwidth,
+      highlightedSublayerView,
+    );
+    crender.chartRendererColumn();
 
     chart.appear(1000, 100);
 

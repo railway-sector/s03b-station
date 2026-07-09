@@ -1,5 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
+import type BuildingComponentSublayer from "@arcgis/core/layers/buildingSublayers/BuildingComponentSublayer";
 import { dateTable } from "./layers";
+import type BuildingSceneLayer from "@arcgis/core/layers/BuildingSceneLayer";
+import type SceneLayer from "@arcgis/core/layers/SceneLayer";
+import type FeatureLayer from "@arcgis/core/layers/FeatureLayer";
 
 export const construction_status = [
   "To be Constructed",
@@ -7,7 +11,9 @@ export const construction_status = [
   "Completed",
 ];
 
-// Updat date
+//----------------------------------------//
+//                Date functions          //
+//----------------------------------------//
 export async function dateUpdate() {
   const monthList = [
     "January",
@@ -45,6 +51,46 @@ export async function dateUpdate() {
 export const stationValue = 18; // FTI
 export const buildingLayerCategory_underground = ["D-Wall", "Slab", "Pile"];
 
+//----------------------------------------//
+//   Layer visibility for layers          //
+//----------------------------------------//
+interface layersRevitVisibilityType {
+  layers:
+    | [
+        BuildingComponentSublayer?,
+        BuildingComponentSublayer?,
+        BuildingComponentSublayer?,
+        BuildingComponentSublayer?,
+        BuildingComponentSublayer?,
+        BuildingComponentSublayer?,
+        BuildingSceneLayer?,
+        SceneLayer?,
+        FeatureLayer?,
+      ]
+    | any;
+  qExpression?: any;
+}
+
+export const resetAllLayers = ({
+  layers,
+  qExpression,
+}: layersRevitVisibilityType) => {
+  layers.map((layer: any) => {
+    if (layer) {
+      if (qExpression) {
+        layer.layer.definitionExpression = qExpression;
+        layer.layer.visible = true;
+      } else {
+        layer.layer.definitionExpression = "1=1";
+        layer.layer.visible = true;
+      }
+    }
+  });
+};
+
+//----------------------------------------//
+//                  Others Tools          //
+//----------------------------------------//
 // Thousand separators function
 export function thousands_separators(num: any) {
   if (num) {
