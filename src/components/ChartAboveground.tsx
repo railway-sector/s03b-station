@@ -38,7 +38,6 @@ export default function ChartAboveground() {
   const [sublayerViewFilter, setSublayerViewFilter] = useState<
     SubLayerView | any
   >();
-  const highlightedSublayerView = useRef<any>(undefined);
   const [resetButtonClicked, setResetButtonClicked] = useState<boolean>(false);
   const chartID = "stack-bar2";
 
@@ -158,7 +157,6 @@ export default function ChartAboveground() {
       chartPaddingRightIconLabel,
       legend,
       setChartPanelwidth,
-      highlightedSublayerView,
     );
     crender.chartRendererColumn();
 
@@ -176,9 +174,6 @@ export default function ChartAboveground() {
       sublayerViewFilter.filter = new FeatureFilter({
         where: undefined,
       });
-
-      highlightedSublayerView.current &&
-        highlightedSublayerView.current.remove();
     }
 
     resetAllLayers({
