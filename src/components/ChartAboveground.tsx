@@ -1,23 +1,23 @@
-import { use, useEffect, useRef, useState } from "react";
-import {
-  stColumnLayer,
-  sublayersAll,
-  chartstack_a,
-  queryc,
-  buildingLayer,
-} from "../layers";
+import { memo, use, useEffect, useRef, useState } from "react";
+import { stColumnLayer, sublayersAll, buildingLayer } from "../layers";
 import * as am5 from "@amcharts/amcharts5";
 import * as am5xy from "@amcharts/amcharts5/xy";
-import { resetAllLayers, thousands_separators, zoomToLayer } from "../query";
+import {
+  makeQuery,
+  resetAllLayers,
+  stackColumnChartData,
+  stackColumnChartRender,
+  thousands_separators,
+  zoomToLayer,
+} from "../query";
 import "@esri/calcite-components/dist/components/calcite-label";
 import { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
 import {
-  buildingTypes_a,
-  chart_colors,
-  chartCategoryTypeField,
-  statusArray,
-  statusField,
-  structureLocationField,
+  a_types_q,
+  location_f,
+  status_f,
+  status_q,
+  b_type_f,
 } from "../uniqueValues";
 
 import SubLayerView from "@arcgis/core/views/layers/BuildingComponentSublayerView";
@@ -27,39 +27,41 @@ import { queryDefinitionExpression } from "../queryExpression";
 import { useQuery } from "@tanstack/react-query";
 import { legendSetter, rootSetter } from "../chartSetter";
 import ChartStackColumnRender from "chart-stack-column-render";
+import ChartStackColumns from "chart-stack-column";
 
 // Draw chart
-export default function ChartAboveground() {
+const ChartAboveground = memo(() => {
   const { chartPanelTabName } = use(MyContext);
-  const [chartPanelwidth, setChartPanelwidth] = useState<any>();
   const arcgisScene = document.querySelector("arcgis-scene") as ArcgisScene;
+
+  const [chartPanelwidth, setChartPanelwidth] = useState<any>();
   const legendRef = useRef<unknown | any | undefined>({});
   const chartRef = useRef<unknown | any | undefined>({});
-  const [sublayerViewFilter, setSublayerViewFilter] = useState<
-    SubLayerView | any
-  >();
+  const [sublayerViewFilter, setSublayerViewFilter] = useState<SubLayerView>();
   const [resetButtonClicked, setResetButtonClicked] = useState<boolean>(false);
   const chartID = "stack-bar2";
 
-  const { data } = useQuery<any>({
-    queryKey: [chartPanelTabName, chartCategoryTypeField],
+  //--- Common qValues and qFields for QueryExpressionLayers class
+  const queryc = makeQuery([chartPanelTabName], [location_f]);
+
+  const sublayersArray = sublayersAll.map((item: any) => item.layer);
+
+  const { data, isLoading } = useQuery<any>({
+    queryKey: [chartPanelTabName, b_type_f],
     queryFn: async () => {
-      const sublayersArray = sublayersAll.map((item: any) => item.layer);
-
-      queryc.qValues = [chartPanelTabName];
-      queryc.qFields = [structureLocationField];
-
       queryDefinitionExpression({
         queryExpression: queryc.queryExpression(),
         featureLayer: sublayersArray,
       });
-
-      chartstack_a.qChart = queryc.queryExpression();
-      chartstack_a.layers = sublayersArray;
-      chartstack_a.categoryTypes = buildingTypes_a;
-      chartstack_a.categoryTypeField = chartCategoryTypeField;
-      chartstack_a.statusState = [1, 2, 3, 4];
-      const chartData = await chartstack_a.chartDataStackColumns();
+      const chartData = await stackColumnChartData({
+        colchart: new ChartStackColumns(),
+        qChart: queryc,
+        categoryTypes: a_types_q,
+        categoryTypeField: b_type_f,
+        layers: sublayersArray,
+        statusField: status_f,
+        statusState: [1, 2, 3, 4],
+      });
 
       zoomToLayer(stColumnLayer, arcgisScene);
 
@@ -132,40 +134,41 @@ export default function ChartAboveground() {
     });
     legendRef.current = legend;
 
-    const crender = new ChartStackColumnRender(
-      true,
-      sublayersAll,
+    //-- Chart render
+    const chartIconPositionX = 0;
+    stackColumnChartRender({
+      render: new ChartStackColumnRender(),
+      revit: true,
+      layers: sublayersAll,
       root,
       chart,
-      chartData,
-      buildingLayer,
-      queryc,
-      buildingTypes_a,
-      chartCategoryTypeField,
-      ["Completed", "To be Constructed"],
-      ["comp", "incomp"],
-      statusArray,
-      statusField,
-      chart_colors,
-      chartBorderLineColor,
-      chartBorderLineWidth,
-      arcgisScene?.view,
-      setSublayerViewFilter,
+      data: chartData,
+      buildingLayer: buildingLayer,
+      qChart: queryc,
+      chartCategoryTypes: a_types_q,
+      chartCategoryTypeField: b_type_f,
+      statusTypename: ["Completed", "To be Constructed"],
+      statusStatename: ["comp", "incomp"],
+      statusArray: status_q,
+      statusField: status_f,
+      seriesStatusColor: status_q.map((c: any) => c.color),
+      strokeColor: chartBorderLineColor,
+      strokeWidth: chartBorderLineWidth,
+      view: arcgisScene?.view,
+      setLayerViewFilter: setSublayerViewFilter,
       new_chartIconSize,
       new_axisFontSize,
-      undefined,
+      chartIconPositionX,
       chartPaddingRightIconLabel,
       legend,
-      setChartPanelwidth,
-    );
-    crender.chartRendererColumn();
-
+      updateChartPanelwidth: setChartPanelwidth,
+    });
     chart.appear(1000, 100);
 
     return () => {
       root.dispose();
     };
-  });
+  }, [chartData, chartPanelTabName]);
 
   //-- Reset clicked event in chart series
   useEffect(() => {
@@ -178,7 +181,7 @@ export default function ChartAboveground() {
 
     resetAllLayers({
       layers: sublayersAll,
-      qExpression: `${structureLocationField} = '${chartPanelTabName}'`,
+      qExpression: `${location_f} = '${chartPanelTabName}'`,
     });
   }, [resetButtonClicked]);
 
@@ -201,7 +204,11 @@ export default function ChartAboveground() {
           alt="Utility Logo"
           height={`${new_imageSize}%`}
           width={`${new_imageSize}%`}
-          style={{ marginTop: "10px", marginLeft: "15px" }}
+          style={{
+            marginTop: "10px",
+            marginLeft: "15px",
+            opacity: isLoading ? 0 : 1,
+          }}
         />
         <dl style={{ alignItems: "center" }}>
           <dt
@@ -231,6 +238,7 @@ export default function ChartAboveground() {
               fontSize: `${new_valueSize}*0.5px`,
               fontFamily: "calibri",
               lineHeight: "1.2",
+              opacity: isLoading ? 0 : 1,
             }}
           >
             ({thousands_separators(totaln)})
@@ -241,31 +249,27 @@ export default function ChartAboveground() {
       <div
         id={chartID}
         style={{
-          height: "61vh",
+          height: "63vh",
           backgroundColor: "rgb(0,0,0,0)",
           color: "white",
-          marginRight: "10px",
+          marginRight: "15px",
+          opacity: isLoading ? 0 : 1,
         }}
       ></div>
       <div
         id="filterButton"
-        style={{
-          width: "50%",
-          marginLeft: "30%",
-          marginTop: "5%",
-          // paddingTop: "10%",
-        }}
+        style={{ width: "50%", marginLeft: "30%", marginTop: "5%" }}
       >
         <calcite-button
           iconEnd="reset"
           scale="s"
-          onClick={() =>
-            setResetButtonClicked(resetButtonClicked === false ? true : false)
-          }
+          onClick={() => setResetButtonClicked(!resetButtonClicked)}
         >
           Reset Chart Filter
         </calcite-button>
       </div>
     </>
   );
-}
+});
+
+export default ChartAboveground;

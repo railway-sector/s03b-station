@@ -7,12 +7,7 @@ import "@arcgis/map-components/components/arcgis-basemap-gallery";
 import "@arcgis/map-components/components/arcgis-layer-list";
 import "@arcgis/map-components/components/arcgis-expand";
 import "@arcgis/map-components/components/arcgis-compass";
-import {
-  alignmentGroupLayer,
-  buildingLayer,
-  prowLayer,
-  stationLayer,
-} from "../layers";
+import { alignmentGroupLayer, buildingLayer, stationLayer } from "../layers";
 import "@esri/calcite-components/dist/components/calcite-button";
 import type { ArcgisScene } from "@arcgis/map-components/dist/components/arcgis-scene";
 import { useState } from "react";
@@ -22,7 +17,6 @@ function MapDisplay() {
   const [_mapView, setMapView] = useState<any>();
 
   arcgisScene?.viewOnReady(() => {
-    arcgisScene?.map?.add(prowLayer);
     arcgisScene?.map?.add(buildingLayer);
     arcgisScene?.map?.add(alignmentGroupLayer);
     arcgisScene?.map?.add(stationLayer);
@@ -38,7 +32,6 @@ function MapDisplay() {
 
   return (
     <arcgis-scene
-      // item-id="5ba14f5a7db34710897da0ce2d46d55f"
       basemap="dark-gray-vector"
       ground="world-elevation"
       viewingMode="local"
