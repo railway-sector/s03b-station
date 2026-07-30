@@ -32,6 +32,15 @@ export const portalItems = (id: any) => {
 export const primaryLabelColor = "#d1d5db";
 export const valueLabelColor = "#d1d5db";
 
+//---------------------------------------------//
+//         Time-Slider Parameter               //
+//---------------------------------------------//
+export const ts_field_q: any = [
+  { datename: "Planned Completion Date", datefield: "finish_plan" },
+  { datename: "Actual Start Date", datefield: "start_actual" },
+  { datename: "Actual Completion Date", datefield: "finish_actual" },
+];
+
 //----------------------------------------------//
 //            Alignment Layers                  //
 //----------------------------------------------//

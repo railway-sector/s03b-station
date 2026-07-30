@@ -9,10 +9,11 @@ import ActionPanel from "./components/ActionPanel";
 import Header from "./components/Header";
 import MainChart from "./components/MainChart";
 import UndergroundSwitch from "./components/UndergroundSwitch";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MyContext } from "./contexts/MyContext";
 import { authenticate } from "./autho";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ts_field_q } from "./uniqueValues";
 
 const queryClient = new QueryClient();
 
@@ -27,11 +28,23 @@ export function App(): React.JSX.Element {
     setChartPanelTabName(newTab);
   };
 
+  const [newTsparam, setNewTsparam] = useState<any>(ts_field_q[0].datename);
+  const updateNewTsparam = useCallback((newParam: any) => {
+    setNewTsparam(newParam);
+  }, []);
+
   return (
     <>
       {loggedInState && (
         <calcite-shell>
-          <MyContext value={{ chartPanelTabName, updateChartPanelTabName }}>
+          <MyContext
+            value={{
+              chartPanelTabName,
+              updateChartPanelTabName,
+              newTsparam,
+              updateNewTsparam,
+            }}
+          >
             <QueryClientProvider client={queryClient}>
               <ActionPanel />
               <UndergroundSwitch />

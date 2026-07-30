@@ -11,9 +11,11 @@ import "@arcgis/map-components/components/arcgis-legend";
 import "@arcgis/map-components/components/arcgis-direct-line-measurement-3d";
 import { buildingLayer } from "../layers";
 import { defineActions } from "../uniqueValues";
+import TimeSlider from "./TimeSlider";
 
 function ActionPanel() {
   const shellPanel: any = document.getElementById("left-shell-panel");
+  const timeSlider = document.querySelector("arcgis-time-slider");
 
   //--- Active & Next Widget
   const [activeWidget, setActiveWidget] = useState<any>(null);
@@ -60,7 +62,11 @@ function ActionPanel() {
       actionActiveWidget.hidden = true;
       shellPanel.collapsed = true;
 
+      //--- Clear Dire Line Measurement
       directLineMeasure && directLineMeasure.clear();
+
+      //--- Timesilder: Reset
+      if (timeSlider) timeSlider.timeExtent = null;
     }
 
     if (nextWidget !== activeWidget) {
@@ -69,6 +75,9 @@ function ActionPanel() {
       );
       actionNextWidget.hidden = false;
       shellPanel.collapsed = false;
+
+      //--- Timesilder Panel: Collapse
+      if (nextWidget === "timeslider") shellPanel.collapsed = true;
     }
   });
 
@@ -123,6 +132,14 @@ function ActionPanel() {
           ></calcite-action>
 
           <calcite-action
+            data-action-id="timeslider"
+            icon="sliders-horizontal"
+            text="Time Slider"
+            id="timeslider"
+            onClick={handleActionClick}
+          ></calcite-action>
+
+          <calcite-action
             data-action-id="information"
             icon="information"
             text="Information"
@@ -164,6 +181,12 @@ function ActionPanel() {
           ></arcgis-direct-line-measurement-3d>
         </calcite-panel>
 
+        <calcite-panel
+          className="timeslider"
+          data-panel-id="timeslider"
+          hidden
+        ></calcite-panel>
+
         <calcite-panel heading="Description" data-panel-id="information" hidden>
           {nextWidget === "information" ? (
             <div style={{ paddingLeft: "20px" }}>
@@ -199,6 +222,10 @@ function ActionPanel() {
           )}
         </calcite-panel>
       </calcite-shell-panel>
+
+      {nextWidget === "timeslider" && nextWidget !== activeWidget && (
+        <TimeSlider />
+      )}
     </>
   );
 }

@@ -75,7 +75,7 @@ export const alignmentGroupLayer = new GroupLayer({
 //            Building Scene Layers            //
 //---------------------------------------------//
 export const buildingLayer = new BuildingSceneLayer({
-  portalItem: portalItems("f9387908df044a8aba99608333bf9f86"),
+  portalItem: portalItems("063f72b865734751a7a20b339dd4197a"),
   title: "FTI (LOD: 350)",
   legendEnabled: false,
 });
