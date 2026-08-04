@@ -4,16 +4,18 @@ import "@esri/calcite-components/dist/components/calcite-shell-panel";
 import "@esri/calcite-components/dist/components/calcite-action";
 import "@esri/calcite-components/dist/components/calcite-action-bar";
 import "@arcgis/map-components/components/arcgis-building-explorer";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import "@arcgis/map-components/components/arcgis-basemap-gallery";
 import "@arcgis/map-components/components/arcgis-layer-list";
 import "@arcgis/map-components/components/arcgis-legend";
 import "@arcgis/map-components/components/arcgis-direct-line-measurement-3d";
-import { buildingLayer } from "../layers";
+import { buildingLayer, sublayersAll } from "../layers";
 import { defineActions } from "../uniqueValues";
 import TimeSlider from "./TimeSlider";
+import { MyContext } from "../contexts/MyContext";
 
 function ActionPanel() {
+  const { chartPanelTabName } = use(MyContext);
   const shellPanel: any = document.getElementById("left-shell-panel");
   const timeSlider = document.querySelector("arcgis-time-slider");
 
@@ -66,7 +68,13 @@ function ActionPanel() {
       directLineMeasure && directLineMeasure.clear();
 
       //--- Timesilder: Reset
-      if (timeSlider) timeSlider.timeExtent = null;
+      if (timeSlider) {
+        timeSlider.timeExtent = null;
+
+        sublayersAll.map((layer: any) => {
+          layer.layer.definitionExpression = `Component = '${chartPanelTabName}'`;
+        });
+      }
     }
 
     if (nextWidget !== activeWidget) {

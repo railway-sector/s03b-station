@@ -289,8 +289,8 @@ export async function defineActions(event: any) {
   item.title === "Rooms (not monitoring)" ||
   item.title === "Walls (not monitoring)" ||
   item.title === "StairsRailing (not monitoring)" ||
-  item.title === "Stairs (not monitoring)"
-    ? // item.title === "Walls (not monitoring)"
-      (item.visible = false)
+  item.title === "Stairs (not monitoring)" ||
+  item.title === "Specialty Equipment (not monitoring)"
+    ? (item.visible = false)
     : (item.visible = true);
 }

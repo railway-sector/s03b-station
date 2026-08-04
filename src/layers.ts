@@ -75,7 +75,7 @@ export const alignmentGroupLayer = new GroupLayer({
 //            Building Scene Layers            //
 //---------------------------------------------//
 export const buildingLayer = new BuildingSceneLayer({
-  portalItem: portalItems("063f72b865734751a7a20b339dd4197a"),
+  portalItem: portalItems("bdba9cc67b54408e9c9d5ba6c7ace9bb"),
   title: "FTI (LOD: 350)",
   legendEnabled: false,
 });
@@ -83,11 +83,11 @@ export const buildingLayer = new BuildingSceneLayer({
 //--- ARCHITECTURAL
 export let floorsLayer: null | any;
 export let wallsLayer: null | any;
-export let roomsLayer: null | any;
 export let genericLayer: null | any;
 export let siteLayer: null | any;
 export let stairsLayer: null | any;
 export let stairsRailingLayer: null | any;
+export let specialtyEquipmentLayer: null | any;
 
 //--- STRUCTURAL
 export let stFramingLayer: null | any;
@@ -95,7 +95,6 @@ export let stColumnLayer: null | any;
 export let stFoundationLayer: null | any;
 export let exteriorShellLayer: null | any;
 export const sublayersAll: null | any = [];
-export const sublayersAll_a: null | any = [];
 
 let architecturalDiscipline: null | any;
 let structuralDiscipline: null | any;
@@ -139,10 +138,6 @@ buildingLayer.when(() => {
         wallsLayer.popupTemplate = popup;
         wallsLayer.title = "Walls (not monitoring)";
         wallsLayer.renderer = norender;
-        // sublayersAll.push({
-        //   name: layer.modelName,
-        //   layer: layer,
-        // });
         break;
 
       case "GenericModel":
@@ -150,22 +145,6 @@ buildingLayer.when(() => {
         genericLayer.popupTemplate = popup;
         genericLayer.title = "GenericModel";
         genericLayer.renderer = norender;
-        // sublayersAll.push({
-        //   name: layer.modelName,
-        //   layer: layer,
-        // });
-        break;
-
-      case "Rooms":
-        roomsLayer = layer;
-        roomsLayer.popupTemplate = popup;
-        roomsLayer.title = "Rooms (not monitoring)";
-        roomsLayer.visible = false;
-        roomsLayer.renderer = norender;
-        // sublayersAll.push({
-        //   name: layer.modelName,
-        //   layer: layer,
-        // });
         break;
 
       case "Site":
@@ -182,13 +161,17 @@ buildingLayer.when(() => {
         stairsLayer.title = "Stairs (not monitoring)";
         stairsLayer.visible = false;
         stairsLayer.renderer = norender;
-        // sublayersAll.push({
-        //   name: layer.modelName,
-        //   layer: layer,
-        // });
         break;
 
       case "StairsRailing":
+        specialtyEquipmentLayer = layer;
+        specialtyEquipmentLayer.popupTemplate = popup;
+        specialtyEquipmentLayer.title = "Specialty Equipment (not monitoring)";
+        specialtyEquipmentLayer.visible = false;
+        specialtyEquipmentLayer.renderer = norender;
+        break;
+
+      case "SpecialtyEquipment":
         stairsRailingLayer = layer;
         stairsRailingLayer.popupTemplate = popup;
         stairsRailingLayer.title = "StairsRailing (not monitoring)";

@@ -9,7 +9,7 @@ import { use, useEffect, useMemo } from "react";
 import { sublayersAll } from "../layers";
 
 export default function TimeSlider() {
-  const { updateNewTsparam, newTsparam } = use(MyContext);
+  const { updateNewTsparam, newTsparam, chartPanelTabName } = use(MyContext);
   const arcgisScene = document.querySelector("arcgis-scene");
   const timeSlider: any = document.querySelector("arcgis-time-slider");
 
@@ -63,12 +63,13 @@ export default function TimeSlider() {
               layers: sublayersAll.map((l: any) => l.layer),
               field_name: newDateField,
               new_date: new_date,
+              component: chartPanelTabName
             });
           }
         },
       );
     });
-  }, [newTsparam, newDateField]);
+  }, [newTsparam, newDateField, chartPanelTabName]);
 
   return (
     <>

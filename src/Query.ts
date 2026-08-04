@@ -33,20 +33,23 @@ interface TimeSliderResetType {
   layers: any[];
   field_name: string;
   new_date: any;
-  contractcp?: string;
+  component?: string;
 }
+
 export function layersTimeSliderReset({
   layers,
   field_name,
   new_date,
-  contractcp,
+  component
 }: TimeSliderResetType) {
-  layers.forEach((layer: any) => {
-    if (!contractcp) {
-      layer.definitionExpression = `${field_name} <= date '${new_date}'`;
+  layers.forEach((layer: any) => {   
+    if (layer.fields?.some((f: any) => f.name === field_name)) {
+      layer.definitionExpression = `${field_name} <= date '${new_date}' AND Component = '${component}'`
     }
+
   });
 }
+
 
 //---------------------------------------------//
 //     Viaduct Stacked Column chart            //
