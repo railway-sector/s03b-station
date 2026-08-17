@@ -10,7 +10,7 @@ import "@arcgis/map-components/components/arcgis-layer-list";
 import "@arcgis/map-components/components/arcgis-legend";
 import "@arcgis/map-components/components/arcgis-direct-line-measurement-3d";
 import { buildingLayer, sublayersAll } from "../layers";
-import { defineActions } from "../uniqueValues";
+import { defineActions, location_f } from "../uniqueValues";
 import TimeSlider from "./TimeSlider";
 import { MyContext } from "../contexts/MyContext";
 
@@ -22,6 +22,13 @@ function ActionPanel() {
   //--- Active & Next Widget
   const [activeWidget, setActiveWidget] = useState<any>(null);
   const [nextWidget, setNextWidget] = useState<any>(null);
+
+  //--- Render only when selected
+  const [hasOpenedBasemaps, setHasOpenedBasemaps] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (nextWidget === "basemaps") setHasOpenedBasemaps(true);
+  }, [nextWidget]);
 
   //--- Widget (Line Measurement & Building Explorer)
   const directLineMeasure = document.querySelector(
@@ -70,9 +77,9 @@ function ActionPanel() {
       //--- Timesilder: Reset
       if (timeSlider) {
         timeSlider.timeExtent = null;
-
-        sublayersAll.map((layer: any) => {
-          layer.layer.definitionExpression = `Component = '${chartPanelTabName}'`;
+        console.log(`${location_f} = ${chartPanelTabName}`);
+        sublayersAll.map((sublayer: any) => {
+          sublayer.layer.definitionExpression = `${location_f} = '${chartPanelTabName}'`;
         });
       }
     }
@@ -167,7 +174,9 @@ function ActionPanel() {
         </calcite-panel>
 
         <calcite-panel heading="Basemaps" data-panel-id="basemaps" hidden>
-          <arcgis-basemap-gallery referenceElement="arcgis-scene"></arcgis-basemap-gallery>
+          {hasOpenedBasemaps ? (
+            <arcgis-basemap-gallery referenceElement="arcgis-scene"></arcgis-basemap-gallery>
+          ) : null}{" "}
         </calcite-panel>
 
         <calcite-panel
